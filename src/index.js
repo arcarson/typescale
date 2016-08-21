@@ -37,7 +37,19 @@ export default function setType({
   scale = 1.33,
   bodyLineHeight = 1.5,
   headingLineHeight = 1.2,
-  fontFamily = 'helvetica',
+  fontFamily = `
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif
+  `,
 } = {}) {
   const styles = generateHeadingElements({
     scale,
