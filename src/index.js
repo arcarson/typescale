@@ -6,9 +6,9 @@ const calcLineHeight = (fontSize, lineHeightRatio) => {
   return roundUpHalf(fontSize * lineHeightRatio)
 }
 
-const fontStyle = (fontFamily, fontSize, lineHeight, fontWeight) => {
+const fontStyle = (fontStack, fontSize, lineHeight, fontWeight) => {
   return {
-    fontFamily,
+    fontFamily: fontStack,
     fontSize: `${fontSize}rem`,
     fontWeight,
     lineHeight: `${lineHeight}rem`,
@@ -20,7 +20,7 @@ const generateHeadingElements = ({
   scale,
   headingLineHeight,
   headingFontWeight,
-  fontFamily,
+  fontStack,
   headingElements = ['h5', 'h4', 'h3', 'h2', 'h1'],
 } = {}) => {
   const styles = {}
@@ -28,7 +28,7 @@ const generateHeadingElements = ({
   headingElements.forEach((element, i) => {
     const fontSize = 1 * Math.pow(scale, i)
     const lineHeight = calcLineHeight(fontSize, headingLineHeight)
-    styles[element] = fontStyle(fontFamily, fontSize, lineHeight, headingFontWeight)
+    styles[element] = fontStyle(fontStack, fontSize, lineHeight, headingFontWeight)
   })
 
   return styles
@@ -40,7 +40,10 @@ export default function setType({
   bodyLineHeight = 1.5,
   headingLineHeight = 1.2,
   headingFontWeight = 'normal',
-  fontFamily = `
+  fontFamily,
+} = {}) {
+  const fontStack = `
+    ${fontFamily},
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -51,23 +54,22 @@ export default function setType({
     "Fira Sans",
     "Droid Sans",
     "Helvetica Neue",
-    sans-serif
-  `,
-} = {}) {
+    sans-serif`
+
   const styles = generateHeadingElements({
     scale,
     headingLineHeight,
     headingFontWeight,
-    fontFamily,
+    fontStack,
   })
 
   styles.html = {
-    fontFamily,
+    fontFamily: fontStack,
     fontSize: baseFontSize,
     lineHeight: bodyLineHeight,
   }
-  styles.p = fontStyle(fontFamily, 1, bodyLineHeight, 'normal')
-  styles.small = fontStyle(fontFamily, (1 / scale), bodyLineHeight, 'normal')
+  styles.p = fontStyle(fontStack, 1, bodyLineHeight, 'normal')
+  styles.small = fontStyle(fontStack, (1 / scale), bodyLineHeight, 'normal')
 
   return styles
 }
