@@ -6,10 +6,11 @@ const calcLineHeight = (fontSize, lineHeightRatio) => {
   return roundUpHalf(fontSize * lineHeightRatio)
 }
 
-const fontStyle = (fontFamily, fontSize, lineHeight) => {
+const fontStyle = (fontFamily, fontSize, lineHeight, fontWeight) => {
   return {
     fontFamily,
     fontSize: `${fontSize}rem`,
+    fontWeight,
     lineHeight: `${lineHeight}rem`,
     margin: 0,
   }
@@ -18,6 +19,7 @@ const fontStyle = (fontFamily, fontSize, lineHeight) => {
 const generateHeadingElements = ({
   scale,
   headingLineHeight,
+  headingFontWeight,
   fontFamily,
   headingElements = ['h5', 'h4', 'h3', 'h2', 'h1'],
 } = {}) => {
@@ -26,7 +28,7 @@ const generateHeadingElements = ({
   headingElements.forEach((element, i) => {
     const fontSize = 1 * Math.pow(scale, i)
     const lineHeight = calcLineHeight(fontSize, headingLineHeight)
-    styles[element] = fontStyle(fontFamily, fontSize, lineHeight)
+    styles[element] = fontStyle(fontFamily, fontSize, lineHeight, headingFontWeight)
   })
 
   return styles
@@ -37,6 +39,7 @@ export default function setType({
   scale = 1.33,
   bodyLineHeight = 1.5,
   headingLineHeight = 1.2,
+  headingFontWeight = 'normal',
   fontFamily = `
     -apple-system,
     BlinkMacSystemFont,
@@ -54,6 +57,7 @@ export default function setType({
   const styles = generateHeadingElements({
     scale,
     headingLineHeight,
+    headingFontWeight,
     fontFamily,
   })
 
@@ -62,8 +66,8 @@ export default function setType({
     fontSize: baseFontSize,
     lineHeight: bodyLineHeight,
   }
-  styles.p = fontStyle(fontFamily, 1, bodyLineHeight)
-  styles.small = fontStyle(fontFamily, (1 / scale), bodyLineHeight)
+  styles.p = fontStyle(fontFamily, 1, bodyLineHeight, 'normal')
+  styles.small = fontStyle(fontFamily, (1 / scale), bodyLineHeight, 'normal')
 
   return styles
 }
