@@ -1,23 +1,22 @@
-const roundUpHalf = (number) => {
-  return Math.ceil(number * 2) / 2
-}
+const pxToRem = (pxValue, context) => `${parseInt(pxValue, 10) / context}rem`
+const stripUnits = (value) => parseInt(value, 10)
+const toPx = (int) => `${int}px`
+const roundUpToNearestMultiple = (int, multiple) => Math.ceil(int / multiple) * multiple
 
-const calcLineHeight = (fontSize, lineHeightRatio) => {
-  return roundUpHalf(fontSize * lineHeightRatio)
-}
-
-const fontStyle = (fontStack, fontSize, lineHeight, fontWeight) => {
+const buildStyle = ({ fontStack, fontSize, lineHeight, fontWeight, spacingUnit }) => {
   return {
-    fontFamily: fontStack,
-    fontSize: `${fontSize}rem`,
+    fontSize: pxToRem(fontSize, spacingUnit),
+    lineHeight: pxToRem(lineHeight, spacingUnit),
     fontWeight,
-    lineHeight: `${lineHeight}rem`,
     margin: 0,
+    fontFamily: fontStack,
   }
 }
 
 const generateHeadingElements = ({
+  baseFontSize,
   scale,
+  spacingUnit,
   headingLineHeight,
   headingFontWeight,
   fontStack,
@@ -26,9 +25,15 @@ const generateHeadingElements = ({
   const styles = {}
 
   headingElements.forEach((element, i) => {
-    const fontSize = 1 * Math.pow(scale, i)
-    const lineHeight = calcLineHeight(fontSize, headingLineHeight)
-    styles[element] = fontStyle(fontStack, fontSize, lineHeight, headingFontWeight)
+    const fontValue = stripUnits(baseFontSize) * Math.pow(scale, i)
+    const lineHeight = roundUpToNearestMultiple((fontValue * headingLineHeight), spacingUnit / 2)
+    styles[element] = buildStyle({
+      fontSize: toPx(fontValue),
+      fontWeight: headingFontWeight,
+      lineHeight,
+      spacingUnit,
+      fontStack,
+    })
   })
 
   return styles
@@ -38,6 +43,7 @@ export default function setType({
   baseFontSize = '16px',
   scale = 1.33,
   bodyLineHeight = 1.5,
+  bodyFontWeight = 'normal',
   headingLineHeight = 1.2,
   headingFontWeight = 'normal',
   fontFamily,
@@ -56,20 +62,39 @@ export default function setType({
     "Helvetica Neue",
     sans-serif`
 
+  // Vertical rhythm unit
+  const spacingUnit = (stripUnits(baseFontSize) * bodyLineHeight) / 2
+
   const styles = generateHeadingElements({
+    baseFontSize,
     scale,
     headingLineHeight,
     headingFontWeight,
     fontStack,
+    spacingUnit,
   })
 
   styles.html = {
     fontFamily: fontStack,
-    fontSize: baseFontSize,
+    fontSize: toPx(spacingUnit),
     lineHeight: bodyLineHeight,
   }
-  styles.p = fontStyle(fontStack, 1, bodyLineHeight, 'normal')
-  styles.small = fontStyle(fontStack, (1 / scale), bodyLineHeight, 'normal')
+
+  styles.p = buildStyle({
+    fontStack,
+    fontSize: stripUnits(baseFontSize),
+    lineHeight: stripUnits(baseFontSize) * bodyLineHeight,
+    fontWeight: bodyFontWeight,
+    spacingUnit,
+  })
+
+  styles.small = buildStyle({
+    fontStack,
+    fontSize: stripUnits(baseFontSize) / scale,
+    lineHeight: stripUnits(baseFontSize) * bodyLineHeight,
+    fontWeight: bodyFontWeight,
+    spacingUnit,
+  })
 
   return styles
 }
