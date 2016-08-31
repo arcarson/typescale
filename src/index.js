@@ -14,7 +14,7 @@ const buildStyle = ({ fontStack, fontSize, lineHeight, fontWeight, spacingUnit }
 }
 
 const generateHeadingElements = ({
-  baseFontSize,
+  bodyFontSize,
   scale,
   spacingUnit,
   headingLineHeight,
@@ -25,7 +25,7 @@ const generateHeadingElements = ({
   const styles = {}
 
   headingElements.forEach((element, i) => {
-    const fontValue = stripUnits(baseFontSize) * Math.pow(scale, i)
+    const fontValue = stripUnits(bodyFontSize) * Math.pow(scale, i)
     const lineHeight = roundUpToNearestMultiple((fontValue * headingLineHeight), spacingUnit / 2)
     styles[element] = buildStyle({
       fontSize: toPx(fontValue),
@@ -40,8 +40,8 @@ const generateHeadingElements = ({
 }
 
 export default function setType({
-  baseFontSize = '16px',
   scale = 1.33,
+  bodyFontSize = '16px',
   bodyLineHeight = 1.5,
   bodyFontWeight = 'normal',
   headingLineHeight = 1.2,
@@ -63,10 +63,10 @@ export default function setType({
     sans-serif`
 
   // Vertical rhythm unit
-  const spacingUnit = (stripUnits(baseFontSize) * bodyLineHeight) / 2
+  const spacingUnit = (stripUnits(bodyFontSize) * bodyLineHeight) / 2
 
   const styles = generateHeadingElements({
-    baseFontSize,
+    bodyFontSize,
     scale,
     headingLineHeight,
     headingFontWeight,
@@ -82,16 +82,16 @@ export default function setType({
 
   styles.p = buildStyle({
     fontStack,
-    fontSize: stripUnits(baseFontSize),
-    lineHeight: stripUnits(baseFontSize) * bodyLineHeight,
+    fontSize: stripUnits(bodyFontSize),
+    lineHeight: stripUnits(bodyFontSize) * bodyLineHeight,
     fontWeight: bodyFontWeight,
     spacingUnit,
   })
 
   styles.small = buildStyle({
     fontStack,
-    fontSize: stripUnits(baseFontSize) / scale,
-    lineHeight: stripUnits(baseFontSize) * bodyLineHeight,
+    fontSize: stripUnits(bodyFontSize) / scale,
+    lineHeight: stripUnits(bodyFontSize) * bodyLineHeight,
     fontWeight: bodyFontWeight,
     spacingUnit,
   })
