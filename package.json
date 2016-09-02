@@ -1,6 +1,6 @@
 {
   "name": "typescale",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Configurable typographic style object using modular scale",
   "main": "lib/index.js",
   "scripts": {
