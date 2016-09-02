@@ -22,11 +22,14 @@ const buildFontStack = (fontFamily) => {
 
 const buildStyle = ({ fontFamily, fontSize, lineHeight, fontWeight, spacingUnit }) => {
   return {
-    fontSize: pxToRem(fontSize, spacingUnit),
-    lineHeight: pxToRem(lineHeight, spacingUnit),
-    fontWeight,
-    margin: 0,
     fontFamily: buildFontStack(fontFamily),
+    fontSize: pxToRem(fontSize, spacingUnit),
+    fontWeight,
+    lineHeight: pxToRem(lineHeight, spacingUnit),
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    marginTop: 0,
   }
 }
 
