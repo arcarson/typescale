@@ -16,6 +16,7 @@ const buildFontStack = (fontFamily) => {
     "Fira Sans",
     "Droid Sans",
     "Helvetica Neue",
+    "Arial",
     sans-serif
   `
 }
