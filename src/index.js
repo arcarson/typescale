@@ -1,9 +1,13 @@
 const pxToRem = (pxValue, context) => `${parseInt(pxValue, 10) / context}rem`
-const stripUnits = (value) => parseInt(value, 10)
-const toPx = (int) => `${int}px`
-const roundUpToNearestMultiple = (int, multiple) => Math.ceil(int / multiple) * multiple
 
-const buildFontStack = (fontFamily) => {
+const stripUnits = value => parseInt(value, 10)
+
+const toPx = int => `${int}px`
+
+const roundUpToNearestMultiple = (int, multiple) =>
+  Math.ceil(int / multiple) * multiple
+
+const buildFontStack = fontFamily => {
   return `
     ${fontFamily},
     -apple-system,
@@ -21,12 +25,23 @@ const buildFontStack = (fontFamily) => {
   `
 }
 
-const buildStyle = ({ fontFamily, fontSize, lineHeight, fontWeight, spacingUnit }) => {
+const buildStyle = ({
+  fontFamily,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  spacingUnit,
+}) => {
+  const normalisedLineHeight = roundUpToNearestMultiple(
+    stripUnits(fontSize) * lineHeight,
+    spacingUnit / 2,
+  )
+
   return {
     fontFamily: buildFontStack(fontFamily),
     fontSize: pxToRem(fontSize, spacingUnit),
     fontWeight,
-    lineHeight: pxToRem(lineHeight, spacingUnit),
+    lineHeight: pxToRem(normalisedLineHeight, spacingUnit),
     marginBottom: 0,
     marginLeft: 0,
     marginRight: 0,
@@ -34,24 +49,25 @@ const buildStyle = ({ fontFamily, fontSize, lineHeight, fontWeight, spacingUnit 
   }
 }
 
-const generateHeadingElements = ({
-  bodyFontSize,
-  scale,
-  spacingUnit,
-  headingLineHeight,
-  headingFontWeight,
-  fontFamily,
-  headingElements = ['h5', 'h4', 'h3', 'h2', 'h1'],
-} = {}) => {
+const generateHeadingElements = (
+  {
+    bodyFontSize,
+    scale,
+    spacingUnit,
+    headingLineHeight,
+    headingFontWeight,
+    fontFamily,
+    headingElements = ['h5', 'h4', 'h3', 'h2', 'h1'],
+  } = {},
+) => {
   const styles = {}
 
   headingElements.forEach((element, i) => {
     const fontValue = stripUnits(bodyFontSize) * Math.pow(scale, i)
-    const lineHeight = roundUpToNearestMultiple((fontValue * headingLineHeight), spacingUnit / 2)
     styles[element] = buildStyle({
       fontSize: toPx(fontValue),
       fontWeight: headingFontWeight,
-      lineHeight,
+      lineHeight: headingLineHeight,
       spacingUnit,
       fontFamily,
     })
@@ -60,27 +76,26 @@ const generateHeadingElements = ({
   return styles
 }
 
-export default function setType({
-  scale = 1.33,
-  bodyFontSize = '16px',
-  bodyLineHeight = 1.5,
-  bodyFontWeight = 'normal',
-  bodyFontFamily = undefined,
-  headingLineHeight = 1.2,
-  headingFontWeight = 'normal',
-  headingFontFamily = undefined,
-} = {}) {
-  // Vertical rhythm unit
-  const spacingUnit = (stripUnits(bodyFontSize) * bodyLineHeight) / 2
+export const calcSpacingUnit = (fontSize, lineHeight) => {
+  return Math.ceil(stripUnits(fontSize) * lineHeight / 2)
+}
 
-  const styles = generateHeadingElements({
-    bodyFontSize,
-    scale,
-    headingLineHeight,
-    headingFontWeight,
-    fontFamily: headingFontFamily || bodyFontFamily,
-    spacingUnit,
-  })
+export default function setType(
+  {
+    scale = 1.33,
+    bodyFontSize = '16px',
+    bodyLineHeight = 1.5,
+    bodyFontWeight = 'normal',
+    bodyFontFamily = undefined,
+    headingLineHeight = 1.2,
+    headingFontWeight = 'normal',
+    headingFontFamily = undefined,
+  } = {},
+) {
+  // Vertical rhythm unit
+  const spacingUnit = calcSpacingUnit(bodyFontSize, bodyLineHeight)
+
+  const styles = {}
 
   styles.html = {
     fontFamily: buildFontStack(bodyFontFamily),
@@ -88,10 +103,22 @@ export default function setType({
     lineHeight: bodyLineHeight,
   }
 
+  Object.assign(
+    styles,
+    generateHeadingElements({
+      bodyFontSize,
+      scale,
+      headingLineHeight,
+      headingFontWeight,
+      fontFamily: headingFontFamily || bodyFontFamily,
+      spacingUnit,
+    }),
+  )
+
   styles.p = buildStyle({
     fontFamily: bodyFontFamily,
     fontSize: stripUnits(bodyFontSize),
-    lineHeight: stripUnits(bodyFontSize) * bodyLineHeight,
+    lineHeight: bodyLineHeight,
     fontWeight: bodyFontWeight,
     spacingUnit,
   })
@@ -99,7 +126,7 @@ export default function setType({
   styles.small = buildStyle({
     fontFamily: bodyFontFamily,
     fontSize: stripUnits(bodyFontSize) / scale,
-    lineHeight: stripUnits(bodyFontSize) * bodyLineHeight,
+    lineHeight: bodyLineHeight,
     fontWeight: bodyFontWeight,
     spacingUnit,
   })
